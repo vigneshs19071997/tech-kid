@@ -32,6 +32,12 @@ export async function POST(req: Request) {
     return Response.json({ error: "Please enter a valid email." }, { status: 400 });
   }
 
+  if (!process.env.DATABASE_URL) {
+    // Database isn't connected yet — accept the enquiry so forms keep working.
+    console.log("Enquiry received (not saved, DATABASE_URL not set):", { type, parentName, phoneDigits, email });
+    return Response.json({ ok: true });
+  }
+
   try {
     const sql = getSql();
     await sql`
